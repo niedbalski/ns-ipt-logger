@@ -23,13 +23,15 @@ var CHAINS_TO_LOG = []string{
 func NewNamespaces(errorChannel *chan error, nsChannel *chan string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		*errorChannel <- err
+		return
 	}
 
 	defer watcher.Close()
 	err = watcher.Add(NS_FILEPATH)
 	if err != nil {
-		log.Fatal(err)
+		*errorChannel <- err
+		return
 	}
 
 	for {
@@ -48,7 +50,6 @@ func NewNamespaces(errorChannel *chan error, nsChannel *chan string) {
 				*errorChannel <- fmt.Errorf("Cannot get watcher events")
 				return
 			}
-			log.Println("error:", err)
 		}
 	}
 }
